@@ -28,5 +28,18 @@ pipeline {
                 sh 'npm install'
             }
         }
+
+        stage('Login en Azure') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                        az login --service-principal -u $darmx-azurerm-client-id -p $darmx-azurerm-client-secret --tenant $darmx-azurerm-tenant-id
+                        az account set --subscription "$darmx-azurerm-subscription-id"
+                    '''
+                }
+            }
+        }
+
+
     }
 }
