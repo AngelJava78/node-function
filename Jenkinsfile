@@ -22,5 +22,11 @@ pipeline {
                 echo 'Deploying...'
             }
         }
+
+        stage('Instalar dependencias') {
+            steps {
+                sh 'npm install'
+            }
+        }
     }
 }
