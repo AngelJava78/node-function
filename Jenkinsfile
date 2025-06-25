@@ -60,7 +60,7 @@ pipeline {
 
         stage('Deploy the Azure Function') {
             steps {
-                sh 'func azure functionapp publish $AZURE_FUNCTIONAPP_NAME'
+                sh 'func azure functionapp publish $AZURE_FUNCTIONAPP_NAME --javascript'
             }
         }
     }
