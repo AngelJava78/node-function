@@ -1,5 +1,11 @@
 pipeline {
     agent any 
+    environment {
+        ARM_CLIENT_ID = credentials('darmx-azurerm-client-id')
+        ARM_CLIENT_SECRET = credentials('darmx-azurerm-client-secret')
+        ARM_TENANT_ID = credentials('darmx-azurerm-tenant-id')
+        ARM_SUBSCRIPTION_ID = credentials('darmx-azurerm-subscription-id')
+    }
 
     stages {
         stage('Build') {
@@ -14,6 +20,10 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing...'
+                echo "ARM_CLIENT_ID: ${ARM_CLIENT_ID}"
+                echo "ARM_CLIENT_SECRET: ${ARM_CLIENT_SECRET}"
+                echo "ARM_TENANT_ID: ${ARM_TENANT_ID}"
+                echo "ARM_SUBSCRIPTION_ID: ${ARM_SUBSCRIPTION_ID}"
             }
         }
 
@@ -33,8 +43,8 @@ pipeline {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh '''
-                        az login --service-principal -u $darmx-azurerm-client-id -p $darmx-azurerm-client-secret --tenant $darmx-azurerm-tenant-id
-                        az account set --subscription "$darmx-azurerm-subscription-id"
+                        az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} --tenant ${ARM_TENANT_ID}
+                        az account set --subscription "${ARM_SUBSCRIPTION_ID}"
                     '''
                 }
             }
