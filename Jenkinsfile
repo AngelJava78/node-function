@@ -41,11 +41,8 @@ pipeline {
 
         stage('Login en Azure') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh '''
-                        az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} --tenant ${ARM_TENANT_ID}
-                        az account set --subscription "${ARM_SUBSCRIPTION_ID}"
-                    '''
+                withCredentials([azureServicePrincipal('credentials_id')]) {
+                    sh 'az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET -t $ARM_TENANT_ID'
                 }
             }
         }
