@@ -58,11 +58,17 @@ pipeline {
             }
         }
 
-        stage('Deploy the Azure Function') {
+        stage('Deploy the Http Azure Function') {
             steps {
-                sh 'func azure functionapp publish $AZURE_FUNCTIONAPP_NAME --javascript'
+                sh 'func azure functionapp publish func-http-dev-eastus --javascript --function httpExample'
             }
         }
+
+        stage('Deploy the Calc Azure Function') {
+            steps {
+                sh 'func azure functionapp publish func-calc-dev-eastus --javascript --function calcFunc'
+            }
+        }        
     }
 
     // post {
