@@ -29,11 +29,11 @@ pipeline {
             }
         }
 
-        stage('show jenkinsfiles') {
-            steps {
-                sh 'func --version'
-            }
-        }
+        // stage('show jenkinsfiles') {
+        //     steps {
+        //         sh 'func --version'
+        //     }
+        // }
 
         stage('Func version') {
             steps {
