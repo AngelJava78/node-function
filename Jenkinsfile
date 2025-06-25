@@ -1,6 +1,8 @@
 pipeline {
     agent any 
     environment {
+        AZURE_FUNCTIONAPP_NAME = 'func-func-dev-eastus'
+        AZURE_RESOURCE_GROUP = 'rg-func-dev-eastus'        
         ARM_CLIENT_ID = credentials('darmx-azurerm-client-id')
         ARM_CLIENT_SECRET = credentials('darmx-azurerm-client-secret')
         ARM_TENANT_ID = credentials('darmx-azurerm-tenant-id')
@@ -50,6 +52,20 @@ pipeline {
             }
         }
 
+        stage('Deploy the Azure Function') {
+            steps {
+                sh 'func azure functionapp publish $AZURE_FUNCTIONAPP_NAME'
+            }
+        }
+
+        post {
+            success {
+                echo '✅ Despliegue exitoso a Azure Function App.'
+            }
+            failure {
+                echo '❌ Error durante el despliegue.'
+            }
+        }
 
     }
 }
