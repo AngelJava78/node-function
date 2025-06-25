@@ -57,15 +57,14 @@ pipeline {
                 sh 'func azure functionapp publish $AZURE_FUNCTIONAPP_NAME'
             }
         }
+    }
 
-        post {
-            success {
-                echo '✅ Despliegue exitoso a Azure Function App.'
-            }
-            failure {
-                echo '❌ Error durante el despliegue.'
-            }
+    post {
+        success {
+            echo '✅ Despliegue exitoso a Azure Function App.'
         }
-
+        failure {
+            echo '❌ Error durante el despliegue.'
+        }
     }
 }
