@@ -35,7 +35,7 @@ pipeline {
             }
         }
 
-        stage('Func version') {
+        stage('Show Jenkinsfile') {
             steps {
                 sh 'cat Jenkinsfile'
             }
