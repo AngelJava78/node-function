@@ -29,7 +29,7 @@ pipeline {
 
         stage('show jenkinsfiles') {
             steps {
-                cat Jenkinsfile
+                sh 'cat Jenkinsfile'
             }
         }
 
