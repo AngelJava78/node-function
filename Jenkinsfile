@@ -27,9 +27,9 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('show jenkinsfiles') {
             steps {
-                echo 'Deploying...'
+                cat Jenkinsfile
             }
         }
 
