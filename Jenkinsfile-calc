@@ -5,7 +5,7 @@ pipeline {
 
         stage('Listar archivos') {
             steps {
-                sh 'ls -lah'
+                sh 'ls -lah ./src/functions'
             }
         }
 
@@ -17,7 +17,7 @@ pipeline {
 
         stage('Listar archivos 2') {
             steps {
-                sh 'ls -lah'
+                sh 'ls -lah ./src/functions'
             }
         }
 
