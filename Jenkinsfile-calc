@@ -15,7 +15,7 @@ pipeline {
             }
         }        
 
-        stage('Listar archivos') {
+        stage('Listar archivos 2') {
             steps {
                 sh 'ls -lah'
             }
