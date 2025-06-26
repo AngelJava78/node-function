@@ -17,8 +17,11 @@ app.http('calcFunc', {
         }
 
         const c = a + b;
+        const d = a * b;
+        const result = `${a} + ${b} = ${c}`;
+        result += `, ${a} * ${b} = ${d}`;
         return {
-            body: `${a} + ${b} = ${c}`
+            body: result
         };
     }
 });
