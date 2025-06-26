@@ -1,0 +1,50 @@
+pipeline {
+    agent any 
+
+    stages {
+
+        stage('Listar archivos') {
+            steps {
+                sh 'ls -lah'
+            }
+        }
+
+        stage('Eliminar archivos') {
+            steps {
+                sh '''find ./src/functions -type f ! -name 'httpExample.js' -delete'''
+            }
+        }        
+
+        stage('Listar archivos') {
+            steps {
+                sh 'ls -lah'
+            }
+        }
+
+        stage('Instalar dependencias') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Login en Azure') {
+            steps {
+                withCredentials([azureServicePrincipal('credentials_id')]) {
+                    sh '''
+                        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
+                        az account set --subscription $AZURE_SUBSCRIPTION_ID
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy the Http Azure Function') {
+            steps {
+                sh 'func azure functionapp publish func-http-dev-eastus --javascript'
+            }
+        }
+      
+    }
+
+
+}
