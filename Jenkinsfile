@@ -37,29 +37,29 @@ pipeline {
         //     }
         // }
 
-        stage('Settings') {
-            steps {
-                sh '''
-                    az functionapp config appsettings set \
-                    --name func-func-dev-eastus \
-                    --resource-group rg-func-dev-eastus \
-                    --settings "mycode=myvalue"
-                '''
-            }
-        }
+        // stage('Settings') {
+        //     steps {
+        //         sh '''
+        //             az functionapp config appsettings set \
+        //             --name func-func-dev-eastus \
+        //             --resource-group rg-func-dev-eastus \
+        //             --settings "mycode=myvalue"
+        //         '''
+        //     }
+        // }
 
-        stage('Command') {
-            steps {
-                script {
-                    def sayHello = {msg ->
-                        sh """
-                            echo 'Hello: $msg'
-                        """
-                    }
-                    sayHello("Angel")
-                }
-            }
-        }
+        // stage('Command') {
+        //     steps {
+        //         script {
+        //             def sayHello = {msg ->
+        //                 sh """
+        //                     echo 'Hello: $msg'
+        //                 """
+        //             }
+        //             sayHello("Angel")
+        //         }
+        //     }
+        // }
 
         stage('Read json config file') {
             steps {
