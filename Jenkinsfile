@@ -64,6 +64,24 @@ pipeline {
             }
         }
 
+        stage('Read json config file') {
+
+            steps {
+                configFileProvider([configFile(fileId: 'config.json', variable: 'jsonfile')]) {
+                    script {
+                        def jsonText = readFile("${env.jsonfile}")
+                        def jsonData = readJSON text: jsonText
+
+                        jsonData.each { clave, valor ->
+                            echo "Clave: ${clave}, Valor: ${valor}"
+                        }
+                    }
+                }
+            }
+
+
+        }
+
         // stage('Deploy the Calc Azure Function') {
         //     steps {
         //         sh 'func azure functionapp publish func-calc-dev-eastus --javascript --function calcFunc'
