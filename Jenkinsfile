@@ -88,12 +88,7 @@ pipeline {
                         def jsonText = readFile("${env.jsonFile}")
                         def jsonData = new JsonSlurper().parseText(jsonText)
 
-                        jsonData.each { clave, valor ->
-                            echo "Clave: ${clave}, Valor: ${valor}"
-                            runAzCommand(clave, valor)
-                        }
-
-                        // Función auxiliar para ejecutar el comando
+                        // Define la función antes del bucle
                         def runAzCommand = { key, value ->
                             sh """
                                 az functionapp config appsettings set \
@@ -101,6 +96,12 @@ pipeline {
                                 --resource-group rg-func-dev-eastus \
                                 --settings ${key}='${value}'
                             """
+                        }
+
+                        // Ahora el bucle puede llamar a runAzCommand
+                        jsonData.each { clave, valor ->
+                            echo "Clave: ${clave}, Valor: ${valor}"
+                            runAzCommand(clave, valor)
                         }
                     }
                 }
