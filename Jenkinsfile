@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 pipeline {
     agent any 
     environment {
@@ -64,13 +66,28 @@ pipeline {
             }
         }
 
+        stage('Leer JSON desde secretFile') {
+            steps {
+                withCredentials([file(credentialsId: 'secret-config.json', variable: 'SECRET_JSON')]) {
+                    script {
+                        def jsonText = readFile("${env.SECRET_JSON}")
+                        def jsonData = readJSON text: jsonText
+
+                        jsonData.each { clave, valor ->
+                            echo "Clave: ${clave}, Valor: ${valor}"
+                        }
+                    }
+                }
+            }
+        }        
+
         stage('Read json config file') {
 
             steps {
-                configFileProvider([configFile(fileId: 'config.json', variable: 'jsonfile')]) {
+                configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
                     script {
-                        def jsonText = readFile("${env.jsonfile}")
-                        def jsonData = readJSON text: jsonText
+                        def jsonText = readFile("${env.jsonFile}")
+                        def jsonData = new JsonSlurper().parseText(jsonText)
 
                         jsonData.each { clave, valor ->
                             echo "Clave: ${clave}, Valor: ${valor}"
