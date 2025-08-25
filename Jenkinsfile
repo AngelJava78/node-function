@@ -85,10 +85,7 @@ pipeline {
             steps {
                 configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
                     script {
-                        def jsonText = readFile("${env.jsonFile}")
-                        def jsonData = new JsonSlurper().parseText(jsonText)
-
-                        // Define la función antes del bucle
+                        // Define the closure BEFORE using it
                         def runAzCommand = { key, value ->
                             sh """
                                 az functionapp config appsettings set \
@@ -98,10 +95,13 @@ pipeline {
                             """
                         }
 
-                        // Ahora el bucle puede llamar a runAzCommand
+                        // Now read and process the JSON
+                        def jsonText = readFile("${env.jsonFile}")
+                        def jsonData = new JsonSlurper().parseText(jsonText)
+
                         jsonData.each { clave, valor ->
                             echo "Clave: ${clave}, Valor: ${valor}"
-                            runAzCommand(clave, valor)
+                            runAzCommand(clave, valor)  // This works now!
                         }
                     }
                 }
