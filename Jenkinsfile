@@ -37,7 +37,7 @@ pipeline {
             }
         }
 
-        stage('Deploy the Http Azure Function') {
+        stage('Settings') {
             steps {
                 sh """
                     az functionapp config appsettings set --name func-func-dev-eastus --resource-group rg-func-dev-eastus --settings "mycode=myvalue"'
