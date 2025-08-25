@@ -52,9 +52,9 @@ pipeline {
             steps {
                 script {
                     def sayHello = {msg ->
-                        sh '''
-                            echo "Hello: $msg"
-                        '''
+                        sh """
+                            echo 'Hello: $msg'
+                        """
                     }
                     sayHello("Angel")
                 }
