@@ -90,14 +90,17 @@ pipeline {
 
                         jsonData.each { clave, valor ->
                             echo "Clave: ${clave}, Valor: ${valor}"
+                            runAzCommand(clave, valor)
+                        }
 
+                        // Función auxiliar para ejecutar el comando
+                        def runAzCommand = { key, value ->
                             sh """
                                 az functionapp config appsettings set \
                                 --name func-func-dev-eastus \
                                 --resource-group rg-func-dev-eastus \
-                                --settings ${clave}='${valor}'
+                                --settings ${key}='${value}'
                             """
-
                         }
                     }
                 }
