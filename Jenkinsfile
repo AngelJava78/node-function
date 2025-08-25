@@ -31,11 +31,11 @@ pipeline {
             }
         }
 
-        stage('Deploy the Http Azure Function') {
-            steps {
-                sh 'func azure functionapp publish func-func-dev-eastus --javascript --function calcFunc'
-            }
-        }
+        // stage('Deploy the Http Azure Function') {
+        //     steps {
+        //         sh 'func azure functionapp publish func-func-dev-eastus --javascript --function calcFunc'
+        //     }
+        // }
 
         stage('Settings') {
             steps {
