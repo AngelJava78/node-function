@@ -13,17 +13,6 @@ pipeline {
     }
 
     stages {
-        stage('Func version') {
-            steps {
-                sh 'func --version'
-            }
-        }
-
-        stage('Show Jenkinsfile') {
-            steps {
-                sh 'cat Jenkinsfile'
-            }
-        }        
 
         stage('Instalar dependencias') {
             steps {
