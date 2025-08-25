@@ -81,7 +81,7 @@ pipeline {
 
                             jsonData.each { clave, valor ->
                                 echo "Processing: ${clave} = ${valor}"
-                            //     //runAzCommand(clave, valor)
+                                runAzCommand("${clave}", "${valor}"")
                             }
                         } catch (Exception e) {
                             echo "ERROR: Failed to process configuration"
