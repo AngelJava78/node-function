@@ -46,7 +46,20 @@ pipeline {
                     --settings "mycode=myvalue"
                 '''
             }
-        }        
+        }
+
+        stage('Command') {
+            steps {
+                script {
+                    def sayHello = {msg ->
+                        sh '''
+                            echo "Hello: ${msg}"
+                        '''
+                    }
+                    sayHello("Angel")
+                }
+            }
+        }
 
         stage('Read json config file') {
             steps {
