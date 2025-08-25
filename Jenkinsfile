@@ -98,6 +98,8 @@ pipeline {
                             def jsonText = readFile("${env.jsonFile}")
                             def jsonData = new JsonSlurper().parseText(jsonText)
                             
+                            runAzCommand("code", "hard code")
+
                             jsonData.each { clave, valor ->
                                 echo "Processing: ${clave} = ${valor}"
                                 runAzCommand(clave, valor)
