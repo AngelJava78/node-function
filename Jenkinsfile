@@ -90,7 +90,14 @@ pipeline {
 
                         jsonData.each { clave, valor ->
                             echo "Clave: ${clave}, Valor: ${valor}"
-                            az functionapp config appsettings set --name func-func-dev-eastus --resource-group rg-func-dev-eastus --settings "${clave}=${valor}"
+
+                            sh """
+                                az functionapp config appsettings set \
+                                --name func-func-dev-eastus \
+                                --resource-group rg-func-dev-eastus \
+                                --settings ${clave}='${valor}'
+                            """
+
                         }
                     }
                 }
