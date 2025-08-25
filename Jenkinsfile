@@ -53,7 +53,7 @@ pipeline {
                 script {
                     def sayHello = {msg ->
                         sh '''
-                            echo "Hello: ${msg}"
+                            echo "Hello: $msg"
                         '''
                     }
                     sayHello("Angel")
