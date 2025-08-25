@@ -68,19 +68,19 @@ pipeline {
                         def runAzCommand = { key, value ->
                             def safeKey = key.toString()
                             def safeValue = value.toString()
-                            sh """
+                            sh '''
                                 az functionapp config appsettings set \
                                 --name func-func-dev-eastus \
                                 --resource-group rg-func-dev-eastus \
-                                --settings ${safeKey}='${safeValue}'
-                            """
+                                --settings $safeKey=$safeValue
+                            '''
                         }                        
                         try {
 
                             def jsonText = readFile("${env.jsonFile}")
                             def jsonData = new JsonSlurper().parseText(jsonText)
                             
-                            //runAzCommand("code", "hard code")
+                            runAzCommand("code", "hard code")
 
                             jsonData.each { clave, valor ->
                                 echo "Processing: ${clave} = ${valor}"
