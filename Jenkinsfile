@@ -37,6 +37,14 @@ pipeline {
             }
         }
 
+        stage('Deploy the Http Azure Function') {
+            steps {
+                sh """
+                    az functionapp config appsettings set --name func-func-dev-eastus --resource-group rg-func-dev-eastus --settings "mycode=myvalue"'
+                """
+            }
+        }        
+
         stage('Read json config file') {
             steps {
                 configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
