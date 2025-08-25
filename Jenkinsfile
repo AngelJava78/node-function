@@ -52,17 +52,17 @@ pipeline {
             steps {
                 configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
                     script {
+                        def runAzCommand = { key, value ->
+                            def safeKey = key.toString()
+                            def safeValue = value.toString()
+                            sh """
+                                az functionapp config appsettings set \
+                                --name func-func-dev-eastus \
+                                --resource-group rg-func-dev-eastus \
+                                --settings ${safeKey}='${safeValue}'
+                            """
+                        }                        
                         try {
-                            def runAzCommand = { key, value ->
-                                def safeKey = key.toString()
-                                def safeValue = value.toString()
-                                sh """
-                                    az functionapp config appsettings set \
-                                    --name func-func-dev-eastus \
-                                    --resource-group rg-func-dev-eastus \
-                                    --settings ${safeKey}='${safeValue}'
-                                """
-                            }
 
                             def jsonText = readFile("${env.jsonFile}")
                             def jsonData = new JsonSlurper().parseText(jsonText)
