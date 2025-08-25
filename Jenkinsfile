@@ -85,23 +85,27 @@ pipeline {
             steps {
                 configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
                     script {
-                        // Define the closure BEFORE using it
-                        def runAzCommand = { key, value ->
-                            sh """
-                                az functionapp config appsettings set \
-                                --name func-func-dev-eastus \
-                                --resource-group rg-func-dev-eastus \
-                                --settings ${key}='${value}'
-                            """
-                        }
+                        try {
+                            def runAzCommand = { key, value ->
+                                sh """
+                                    az functionapp config appsettings set \
+                                    --name func-func-dev-eastus \
+                                    --resource-group rg-func-dev-eastus \
+                                    --settings ${key}='${value}'
+                                """
+                            }
 
-                        // Now read and process the JSON
-                        def jsonText = readFile("${env.jsonFile}")
-                        def jsonData = new JsonSlurper().parseText(jsonText)
-
-                        jsonData.each { clave, valor ->
-                            echo "Clave: ${clave}, Valor: ${valor}"
-                            runAzCommand(clave, valor)  // This works now!
+                            def jsonText = readFile("${env.jsonFile}")
+                            def jsonData = new JsonSlurper().parseText(jsonText)
+                            
+                            jsonData.each { clave, valor ->
+                                echo "Processing: ${clave} = ${valor}"
+                                runAzCommand(clave, valor)
+                            }
+                        } catch (Exception e) {
+                            echo "ERROR: Failed to process configuration"
+                            echo "${e.toString()}"
+                            error("Pipeline failed due to configuration error")
                         }
                     }
                 }
