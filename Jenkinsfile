@@ -82,7 +82,6 @@ pipeline {
         // }        
 
         stage('Read json config file') {
-
             steps {
                 configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
                     script {
@@ -96,8 +95,6 @@ pipeline {
                     }
                 }
             }
-
-
         }
 
         // stage('Deploy the Calc Azure Function') {
