@@ -66,20 +66,20 @@ pipeline {
             }
         }
 
-        stage('Leer JSON desde secretFile') {
-            steps {
-                withCredentials([file(credentialsId: 'secret-config.json', variable: 'SECRET_JSON')]) {
-                    script {
-                        def jsonText = readFile("${env.SECRET_JSON}")
-                        def jsonData = readJSON text: jsonText
+        // stage('Leer JSON desde secretFile') {
+        //     steps {
+        //         withCredentials([file(credentialsId: 'secret-config.json', variable: 'SECRET_JSON')]) {
+        //             script {
+        //                 def jsonText = readFile("${env.SECRET_JSON}")
+        //                 def jsonData = readJSON text: jsonText
 
-                        jsonData.each { clave, valor ->
-                            echo "Clave: ${clave}, Valor: ${valor}"
-                        }
-                    }
-                }
-            }
-        }        
+        //                 jsonData.each { clave, valor ->
+        //                     echo "Clave: ${clave}, Valor: ${valor}"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }        
 
         stage('Read json config file') {
 
