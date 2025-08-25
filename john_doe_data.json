@@ -1,0 +1,13 @@
+{
+    "nombre": "John Doe",
+    "correo": "johndoe@example.com",
+    "telefono": "+1-555-123-4567",
+    "direccion": {
+        "calle": "123 Main St",
+        "ciudad": "Springfield",
+        "estado": "IL",
+        "codigo_postal": "62704",
+        "pais": "USA"
+    },
+    "empresa": "Doe Industries"
+}

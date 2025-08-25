@@ -67,11 +67,11 @@ pipeline {
                             def jsonText = readFile("${env.jsonFile}")
                             def jsonData = new JsonSlurper().parseText(jsonText)
                             
-                            runAzCommand("code", "hard code")
+                            //runAzCommand("code", "hard code")
 
                             jsonData.each { clave, valor ->
                                 echo "Processing: ${clave} = ${valor}"
-                                runAzCommand(clave, valor)
+                                //runAzCommand(clave, valor)
                             }
                         } catch (Exception e) {
                             echo "ERROR: Failed to process configuration"

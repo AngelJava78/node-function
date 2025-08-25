@@ -1,0 +1,83 @@
+pipeline {
+    agent any 
+    environment {
+        AZURE_FUNCTIONAPP_NAME = 'FnaNciFilesManagerDev'
+        AZURE_RESOURCE_GROUP = 'rg-funcapp-mit-dev-001'
+        DIRECTORIO_SOURCE= "source/azf-ncifilesmanager-js/"
+        GIT_REPO_URL = "https://github.com/Profuturo-Afore/node-azf-ncifilesmanager-js"
+        // Variable para la rama de GitHub desde donde se realizará el rollback
+        GIT_BRANCH = "FEATURE_TRAS_IMSS_DISP_DEV"
+    }
+
+    stages {
+        stage('Clonar Repo') {
+            steps {
+                script {
+                    echo "Clonando el repositorio desde ${env.GIT_REPO_URL} en la rama ${env.GIT_BRANCH}..."
+                    // Clona el repositorio especificado en la URL
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: "${env.GIT_BRANCH}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'LocalBranch', localBranch: "${env.GIT_BRANCH}"]],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[
+                            credentialsId: "Token-Github-E0001098",
+                            url: "${env.GIT_REPO_URL}"
+                        ]]
+                    ])
+                }
+            }
+        }
+        stage('Escaneo de Checkmarx') {
+            steps {
+                script {
+                    echo "Escaneo de Checkmarx"
+                    echo "Email de escaneo de Checkmarx"
+                }
+            }
+        }
+        stage('Func version') {
+            steps {
+                sh 'func --version'
+            }
+        }     
+
+        stage('Instalar dependencias') {
+            steps {
+                sh """
+                    #!/bin/bash
+                    cd \${DIRECTORIO_SOURCE}
+                    npm install
+
+                """
+            }
+        }
+
+        stage('Login en Azure') {
+            steps {
+                withCredentials([azureServicePrincipal('credentials_azure_id')]) {
+                    sh '''
+                        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
+                        az account set --subscription $AZURE_SUBSCRIPTION_ID
+                    '''
+                }
+            }
+        }
+        
+        stage('Deploy Azure Function') {
+            steps {
+                sh 'func azure functionapp publish func-func-dev-eastus --javascript'
+                // sh 'func azure functionapp publish func-func-dev-eastus --javascript --function calcFunc'
+            }
+        }       
+    }
+
+    post {
+        success {
+            echo '✅ Despliegue exitoso a Azure Function App.'
+        }
+        failure {
+            echo '❌ Error durante el despliegue.'
+        }
+    }
+}
