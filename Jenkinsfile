@@ -54,11 +54,13 @@ pipeline {
                     script {
                         try {
                             def runAzCommand = { key, value ->
+                                def safeKey = key.toString()
+                                def safeValue = value.toString()
                                 sh """
                                     az functionapp config appsettings set \
                                     --name func-func-dev-eastus \
                                     --resource-group rg-func-dev-eastus \
-                                    --settings ${key}='${value}'
+                                    --settings ${safeKey}='${safeValue}'
                                 """
                             }
 
