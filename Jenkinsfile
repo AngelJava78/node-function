@@ -95,23 +95,27 @@ pipeline {
 
         stage('Read json config file') {
             steps {
-                configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
-                    sh '''
-                        #!/bin/bash
-                        set -e
+                sh '''
+                    #!/bin/bash
+                    set -e
 
-                        echo "Reading config from: $jsonFile"
+                    CONFIG_FILE="config.json"
 
-                        # Leer y procesar cada clave-valor del JSON
-                        jq -r 'to_entries[] | "\(.key)=\(.value)"' "$jsonFile" | while IFS='=' read -r key value; do
-                            echo "Setting: $key=$value"
-                            az functionapp config appsettings set \
-                                --name func-func-dev-eastus \
-                                --resource-group rg-func-dev-eastus \
-                                --settings "$key=$value"
-                        done
-                    '''
-                }
+                    if [[ ! -f "$CONFIG_FILE" ]]; then
+                        echo "ERROR: Archivo $CONFIG_FILE no encontrado"
+                        exit 1
+                    fi
+
+                    echo "Leyendo configuración desde: $CONFIG_FILE"
+
+                    jq -r 'to_entries[] | "\(.key)=\(.value)"' "$CONFIG_FILE" | while IFS='=' read -r key value; do
+                        echo "Aplicando: $key=$value"
+                        az functionapp config appsettings set \
+                            --name func-func-dev-eastus \
+                            --resource-group rg-func-dev-eastus \
+                            --settings "$key=$value"
+                    done
+                '''
             }
         }
     }
