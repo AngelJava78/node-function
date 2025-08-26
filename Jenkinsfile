@@ -101,6 +101,8 @@ pipeline {
 
                     CONFIG_FILE="config.json"
 
+                    cat <<EOF > $CONFIG_FILE
+
                     if [[ ! -f "$CONFIG_FILE" ]]; then
                         echo "ERROR: Archivo $CONFIG_FILE no encontrado"
                         exit 1
