@@ -95,13 +95,10 @@ pipeline {
 
         stage('Read json config file') {
             steps {
-                sh '''
-                    #!/bin/bash
+                sh '''#!/bin/bash
                     set -e
 
                     CONFIG_FILE="config.json"
-
-                    cat <<EOF > $CONFIG_FILE
 
                     if [[ ! -f "$CONFIG_FILE" ]]; then
                         echo "ERROR: Archivo $CONFIG_FILE no encontrado"
@@ -110,7 +107,8 @@ pipeline {
 
                     echo "Leyendo configuración desde: $CONFIG_FILE"
 
-                    jq -r 'to_entries[] | "\(.key)=\(.value)"' "$CONFIG_FILE" | while IFS='=' read -r key value; do
+                    # Usar jq con comillas simples para evitar conflictos con Groovy
+                    jq -r 'to_entries[] | [.key, .value] | @tsv' "$CONFIG_FILE" | while IFS=$'\\t' read -r key value; do
                         echo "Aplicando: $key=$value"
                         az functionapp config appsettings set \
                             --name func-func-dev-eastus \
