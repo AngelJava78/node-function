@@ -93,30 +93,57 @@ pipeline {
         //     }
         // }
 
+        // stage('Read json config file') {
+        //     steps {
+        //         sh '''#!/bin/bash
+        //             set -e
+
+        //             CONFIG_FILE="config.json"
+
+        //             if [[ ! -f "$CONFIG_FILE" ]]; then
+        //                 echo "ERROR: Archivo $CONFIG_FILE no encontrado"
+        //                 exit 1
+        //             fi
+
+        //             echo "Leyendo configuración desde: $CONFIG_FILE"
+
+        //             # Usar jq con comillas simples para evitar conflictos con Groovy
+        //             jq -r 'to_entries[] | [.key, .value] | @tsv' "$CONFIG_FILE" | while IFS=$'\\t' read -r key value; do
+        //                 echo "Aplicando: $key=$value"
+        //                 az functionapp config appsettings set \
+        //                     --name func-func-dev-eastus \
+        //                     --resource-group rg-func-dev-eastus \
+        //                     --settings "$key=$value"
+        //             done
+        //         '''
+        //     }
+        // }
+
         stage('Read json config file') {
             steps {
-                sh '''#!/bin/bash
-                    set -e
+                configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
+                    sh '''#!/bin/bash
+                        set -e
 
-                    CONFIG_FILE="config.json"
+                        CONFIG_FILE="$jsonFile"
 
-                    if [[ ! -f "$CONFIG_FILE" ]]; then
-                        echo "ERROR: Archivo $CONFIG_FILE no encontrado"
-                        exit 1
-                    fi
+                        if [[ ! -f "$CONFIG_FILE" ]]; then
+                            echo "ERROR: Archivo $CONFIG_FILE no encontrado"
+                            exit 1
+                        fi
 
-                    echo "Leyendo configuración desde: $CONFIG_FILE"
+                        echo "Leyendo configuración desde: $CONFIG_FILE"
 
-                    # Usar jq con comillas simples para evitar conflictos con Groovy
-                    jq -r 'to_entries[] | [.key, .value] | @tsv' "$CONFIG_FILE" | while IFS=$'\\t' read -r key value; do
-                        echo "Aplicando: $key=$value"
-                        az functionapp config appsettings set \
-                            --name func-func-dev-eastus \
-                            --resource-group rg-func-dev-eastus \
-                            --settings "$key=$value"
-                    done
-                '''
+                        jq -r 'to_entries[] | [.key, .value] | @tsv' "$CONFIG_FILE" | while IFS=$'\\t' read -r key value; do
+                            echo "Aplicando: $key=$value"
+                            az functionapp config appsettings set \
+                                --name func-func-dev-eastus \
+                                --resource-group rg-func-dev-eastus \
+                                --settings "$key=$value"
+                        done
+                    '''
+                }
             }
-        }
+        }        
     }
 }
