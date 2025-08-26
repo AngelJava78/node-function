@@ -37,16 +37,16 @@ pipeline {
         //     }
         // }
 
-        // stage('Settings') {
-        //     steps {
-        //         sh '''
-        //             az functionapp config appsettings set \
-        //             --name func-func-dev-eastus \
-        //             --resource-group rg-func-dev-eastus \
-        //             --settings "mycode=myvalue"
-        //         '''
-        //     }
-        // }
+        stage('Settings') {
+            steps {
+                sh '''
+                    az functionapp config appsettings set \
+                    --name func-func-dev-eastus \
+                    --resource-group rg-func-dev-eastus \
+                    --settings "mycode=myvalue"
+                '''
+            }
+        }
 
         // stage('Command') {
         //     steps {
@@ -61,34 +61,56 @@ pipeline {
         //     }
         // }
 
+        // stage('Read json config file') {
+        //     steps {
+        //         configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
+        //             script {
+        //                 def runAzCommand = { key, value ->
+        //                     def safeKey = key.toString()
+        //                     def safeValue = value.toString()
+        //                     sh """
+        //                         az functionapp config appsettings set --name func-func-dev-eastus --resource-group rg-func-dev-eastus --settings '$safeKey=$safeValue'
+        //                     """
+        //                 }                        
+        //                 try {
+
+        //                     def jsonText = readFile("${env.jsonFile}")
+        //                     def jsonData = new JsonSlurper().parseText(jsonText)
+                            
+        //                     //runAzCommand("code", "hard code")
+
+        //                     jsonData.each { clave, valor ->
+        //                         echo "Processing: ${clave} = ${valor}"
+        //                         runAzCommand("$clave", "$valor")
+        //                     }
+        //                 } catch (Exception e) {
+        //                     echo "ERROR: Failed to process configuration"
+        //                     echo "${e.toString()}"
+        //                     error("Pipeline failed due to configuration error")
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
         stage('Read json config file') {
             steps {
                 configFileProvider([configFile(fileId: 'config.json', variable: 'jsonFile')]) {
-                    script {
-                        def runAzCommand = { key, value ->
-                            def safeKey = key.toString()
-                            def safeValue = value.toString()
-                            sh """
-                                az functionapp config appsettings set --name func-func-dev-eastus --resource-group rg-func-dev-eastus --settings '$safeKey=$safeValue'
-                            """
-                        }                        
-                        try {
+                    sh '''
+                        #!/bin/bash
+                        set -e
 
-                            def jsonText = readFile("${env.jsonFile}")
-                            def jsonData = new JsonSlurper().parseText(jsonText)
-                            
-                            //runAzCommand("code", "hard code")
+                        echo "Reading config from: $jsonFile"
 
-                            jsonData.each { clave, valor ->
-                                echo "Processing: ${clave} = ${valor}"
-                                runAzCommand("$clave", "$valor")
-                            }
-                        } catch (Exception e) {
-                            echo "ERROR: Failed to process configuration"
-                            echo "${e.toString()}"
-                            error("Pipeline failed due to configuration error")
-                        }
-                    }
+                        # Leer y procesar cada clave-valor del JSON
+                        jq -r 'to_entries[] | "\(.key)=\(.value)"' "$jsonFile" | while IFS='=' read -r key value; do
+                            echo "Setting: $key=$value"
+                            az functionapp config appsettings set \
+                                --name func-func-dev-eastus \
+                                --resource-group rg-func-dev-eastus \
+                                --settings "$key=$value"
+                        done
+                    '''
                 }
             }
         }
