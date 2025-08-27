@@ -30,7 +30,8 @@ pipeline {
         stage('Leer secreto de Azure Key Vault') {
             steps {
                 sh '''
-                    echo "JSON completo: ${JOHN_SECRET}"
+                    echo "Mostrando JSON formateado:"
+                    echo "$JOHN_SECRET" | jq .
                 '''
             }
         }
