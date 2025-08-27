@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         // Archivo secreto con configuración en formato JSON
-        SECRET_JSON = credentials('john-secret-kv') // ID del Secret File
+        JOHN_SECRET = credentials('john-secret-kv') // ID de la credencial Azure Key Vault
     }
 
     stages {
@@ -27,29 +27,22 @@ pipeline {
             }
         }
 
-        stage('Apply Azure Function settings from secret JSON') {
+        stage('Apply Azure Function settings from Key Vault Secret') {
             steps {
-                sh '''
-                    echo "Leyendo configuraciones desde archivo secreto..."
+                script {
+                    // Parsear el JSON del secreto
+                    def jsonSlurper = new groovy.json.JsonSlurper()
+                    def jsonObject = jsonSlurper.parseText(JOHN_SECRET)
 
-                    if [ ! -f "$SECRET_JSON" ]; then
-                        echo "ERROR: Archivo secreto no encontrado: $SECRET_JSON"
-                        exit 1
-                    fi
+                    // Construir los comandos para az functionapp config appsettings set
+                    def commands = []
+                    jsonObject.each { key, value ->
+                        commands.add("az functionapp config appsettings set --name func-func-dev-eastus --resource-group rg-func-dev-eastus --settings \"${key}=${value}\"")
+                    }
 
-                    jq -r 'to_entries[] | "\\(.key)=\\(.value)"' "$SECRET_JSON" | while IFS='=' read -r key value; do
-                        if [ -z "$key" ] || [ -z "$value" ]; then
-                            echo "Saltando configuración inválida: $key=$value"
-                            continue
-                        fi
-
-                        echo "Aplicando configuración: $key=$value"
-                        az functionapp config appsettings set \
-                            --name func-func-dev-eastus \
-                            --resource-group rg-func-dev-eastus \
-                            --settings "$key=$value"
-                    done
-                '''
+                    // Ejecutar los comandos
+                    sh(commands.join(' && '))
+                }
             }
         }
     }
