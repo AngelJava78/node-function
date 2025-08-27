@@ -35,7 +35,7 @@ pipeline {
                     echo "Mostrando JSON formateado:"
                     echo "$JOHN_SECRET" | jq .
 
-                    jq -r 'to_entries[] | "\\(.key)=\\(.value)"' "$SECRET_JSON" | while IFS='=' read -r key value; do
+                    jq -r 'to_entries[] | "\\(.key)=\\(.value)"' "$JOHN_SECRET" | while IFS='=' read -r key value; do
                         if [ -z "$key" ] || [ -z "$value" ]; then
                             echo "Saltando configuración inválida: $key=$value"
                             continue
