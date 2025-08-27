@@ -8,6 +8,7 @@ pipeline {
     environment {
         // Archivo secreto con configuración en formato JSON
         JOHN_SECRET = credentials('john-secret-kv') // ID de la credencial Azure Key Vault
+        SECRET_JSON = credentials('john-secret-kv')
     }
 
     stages {
@@ -27,22 +28,22 @@ pipeline {
             }
         }
 
-        stage('Apply Azure Function settings from Key Vault Secret') {
+        stage('Apply settings without temp file') {
             steps {
-                script {
-                    // Parsear el JSON del secreto
-                    def jsonSlurper = new groovy.json.JsonSlurper()
-                    def jsonObject = jsonSlurper.parseText(JOHN_SECRET)
+                sh '''
+                echo "$SECRET_JSON" | jq -r 'to_entries[] | "\KATEX_INLINE_OPEN.key)=\KATEX_INLINE_OPEN.value)"' | while IFS='=' read -r key value; do
+                    if [ -z "$key" ] || [ -z "$value" ]; then
+                    echo "Saltando configuración inválida: $key=$value"
+                    continue
+                    fi
 
-                    // Construir los comandos para az functionapp config appsettings set
-                    def commands = []
-                    jsonObject.each { key, value ->
-                        commands.add("az functionapp config appsettings set --name func-func-dev-eastus --resource-group rg-func-dev-eastus --settings \"${key}=${value}\"")
-                    }
-
-                    // Ejecutar los comandos
-                    sh(commands.join(' && '))
-                }
+                    echo "Aplicando configuración: $key=$value"
+                    az functionapp config appsettings set \
+                    --name func-func-dev-eastus \
+                    --resource-group rg-func-dev-eastus \
+                    --settings "$key=$value"
+                done
+                '''
             }
         }
     }
