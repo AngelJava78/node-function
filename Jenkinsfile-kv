@@ -8,7 +8,6 @@ pipeline {
     environment {
         // Archivo secreto con configuración en formato JSON
         JOHN_SECRET = credentials('john-secret-kv') // ID de la credencial Azure Key Vault
-        KV_CREDENTIALS_ID = 'john-secret-kv'
     }
 
     stages {
@@ -30,20 +29,9 @@ pipeline {
 
         stage('Leer secreto de Azure Key Vault') {
             steps {
-                script {
-                    // Leer el secreto desde Azure Key Vault
-                    withCredentials([azureKeyVaultSecret(
-                        credentialsId: KV_CREDENTIALS_ID,
-                        secretValues: [
-                            [secretValue: 'SECRET_JSON', vaultUrl: 'https://kv-func-shared-eastus.vault.azure.net', secretName: 'john-secret']
-                        ]
-                    )]) {
-
-
-                        // También puedes mostrar el JSON completo si lo necesitas
-                        echo "JSON completo: ${SECRET_JSON}"
-                    }
-                }
+                sh '''
+                    echo "JSON completo: ${JOHN_SECRET}"
+                '''
             }
         }
     }
