@@ -38,16 +38,7 @@ pipeline {
                             [secretValue: 'SECRET_JSON', vaultUrl: 'https://kv-func-shared-eastus.vault.azure.net', secretName: 'john-secret']
                         ]
                     )]) {
-                        // El secreto está ahora disponible en la variable SECRET_JSON
-                        // Parsear el JSON para acceder a los valores individuales
-                        def secretData = readJSON text: SECRET_JSON
 
-                        // Mostrar los valores del secreto
-                        echo "Nombre: ${secretData.name}"
-                        echo "Apellido: ${secretData.lastname}"
-                        echo "Email: ${secretData.email}"
-                        echo "Teléfono: ${secretData.phone}"
-                        echo "Compañía: ${secretData.company}"
 
                         // También puedes mostrar el JSON completo si lo necesitas
                         echo "JSON completo: ${SECRET_JSON}"
