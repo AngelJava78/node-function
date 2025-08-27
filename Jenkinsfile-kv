@@ -9,6 +9,7 @@ pipeline {
         // Archivo secreto con configuración en formato JSON
         JOHN_SECRET = credentials('john-secret-kv') // ID de la credencial Azure Key Vault
         SECRET_JSON = credentials('john-secret-kv')
+        KV_CREDENTIALS_ID = 'john-secret-kv'
     }
 
     stages {
@@ -28,22 +29,31 @@ pipeline {
             }
         }
 
-        stage('Apply settings without temp file') {
+        stage('Leer secreto de Azure Key Vault') {
             steps {
-                sh '''
-                echo "$SECRET_JSON" | jq -r 'to_entries[] | "\KATEX_INLINE_OPEN.key)=\KATEX_INLINE_OPEN.value)"' | while IFS='=' read -r key value; do
-                    if [ -z "$key" ] || [ -z "$value" ]; then
-                    echo "Saltando configuración inválida: $key=$value"
-                    continue
-                    fi
+                script {
+                    // Leer el secreto desde Azure Key Vault
+                    withCredentials([azureKeyVaultSecret(
+                        credentialsId: KV_CREDENTIALS_ID,
+                        secretValues: [
+                            [secretValue: 'SECRET_JSON', vaultUrl: 'https://kv-func-shared-eastus.vault.azure.net', secretName: 'john-secret']
+                        ]
+                    )]) {
+                        // El secreto está ahora disponible en la variable SECRET_JSON
+                        // Parsear el JSON para acceder a los valores individuales
+                        def secretData = readJSON text: SECRET_JSON
 
-                    echo "Aplicando configuración: $key=$value"
-                    az functionapp config appsettings set \
-                    --name func-func-dev-eastus \
-                    --resource-group rg-func-dev-eastus \
-                    --settings "$key=$value"
-                done
-                '''
+                        // Mostrar los valores del secreto
+                        echo "Nombre: ${secretData.name}"
+                        echo "Apellido: ${secretData.lastname}"
+                        echo "Email: ${secretData.email}"
+                        echo "Teléfono: ${secretData.phone}"
+                        echo "Compañía: ${secretData.company}"
+
+                        // También puedes mostrar el JSON completo si lo necesitas
+                        echo "JSON completo: ${SECRET_JSON}"
+                    }
+                }
             }
         }
     }
