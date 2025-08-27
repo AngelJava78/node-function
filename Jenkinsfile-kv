@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    options {
+        ansiColor('xterm')
+    }
+
+    environment {
+        // Archivo secreto con configuración en formato JSON
+        SECRET_JSON = credentials('adrian.json') // ID del Secret File
+    }
+
+    stages {
+        stage('Login en Azure') {
+            steps {
+                withCredentials([azureServicePrincipal(credentialsId: 'credentials_id')]) {
+                    sh '''
+                        echo "Autenticando en Azure..."
+                        az login --service-principal \
+                            -u "$AZURE_CLIENT_ID" \
+                            -p "$AZURE_CLIENT_SECRET" \
+                            --tenant "$AZURE_TENANT_ID"
+
+                        az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+                    '''
+                }
+            }
+        }
+
+        stage('Apply Azure Function settings from secret JSON') {
+            steps {
+                sh '''
+                    echo "Leyendo configuraciones desde archivo secreto..."
+
+                    if [ ! -f "$SECRET_JSON" ]; then
+                        echo "ERROR: Archivo secreto no encontrado: $SECRET_JSON"
+                        exit 1
+                    fi
+
+                    jq -r 'to_entries[] | "\\(.key)=\\(.value)"' "$SECRET_JSON" | while IFS='=' read -r key value; do
+                        if [ -z "$key" ] || [ -z "$value" ]; then
+                            echo "Saltando configuración inválida: $key=$value"
+                            continue
+                        fi
+
+                        echo "Aplicando configuración: $key=$value"
+                        az functionapp config appsettings set \
+                            --name func-func-dev-eastus \
+                            --resource-group rg-func-dev-eastus \
+                            --settings "$key=$value"
+                    done
+                '''
+            }
+        }
+    }
+}
