@@ -8,7 +8,6 @@ pipeline {
     environment {
         // Archivo secreto con configuración en formato JSON
         JOHN_SECRET = credentials('john-secret-kv') // ID de la credencial Azure Key Vault
-        SECRET_JSON = credentials('john-secret-kv')
         KV_CREDENTIALS_ID = 'john-secret-kv'
     }
 
