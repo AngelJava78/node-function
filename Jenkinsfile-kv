@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         // Archivo secreto con configuración en formato JSON
-        SECRET_JSON = credentials('adrian.json') // ID del Secret File
+        SECRET_JSON = credentials('john-secret-kv') // ID del Secret File
     }
 
     stages {
