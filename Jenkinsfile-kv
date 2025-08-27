@@ -32,10 +32,8 @@ pipeline {
                 sh '''
                     echo "Leyendo configuraciones desde archivo secreto..."
 
-                    if [ ! -f "$SECRET_JSON" ]; then
-                        echo "ERROR: Archivo secreto no encontrado: $SECRET_JSON"
-                        exit 1
-                    fi
+                    echo "Mostrando JSON formateado:"
+                    echo "$JOHN_SECRET" | jq .
 
                     jq -r 'to_entries[] | "\\(.key)=\\(.value)"' "$SECRET_JSON" | while IFS='=' read -r key value; do
                         if [ -z "$key" ] || [ -z "$value" ]; then
