@@ -30,8 +30,25 @@ pipeline {
         stage('Leer secreto de Azure Key Vault') {
             steps {
                 sh '''
-                    echo "Mostrando JSON formateado:"
-                    echo "$JOHN_SECRET" | jq .
+                    echo "Leyendo configuraciones desde archivo secreto..."
+
+                    if [ ! -f "$SECRET_JSON" ]; then
+                        echo "ERROR: Archivo secreto no encontrado: $SECRET_JSON"
+                        exit 1
+                    fi
+
+                    jq -r 'to_entries[] | "\\(.key)=\\(.value)"' "$SECRET_JSON" | while IFS='=' read -r key value; do
+                        if [ -z "$key" ] || [ -z "$value" ]; then
+                            echo "Saltando configuración inválida: $key=$value"
+                            continue
+                        fi
+
+                        echo "Aplicando configuración: $key=$value"
+                        az functionapp config appsettings set \
+                            --name func-func-dev-eastus \
+                            --resource-group rg-func-dev-eastus \
+                            --settings "$key=$value"
+                    done
                 '''
             }
         }
